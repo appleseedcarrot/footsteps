@@ -35,11 +35,12 @@ export default defineManifest({
   },
   web_accessible_resources: [
     {
-      resources: ['img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png'],
-      matches: [],
+      resources: ['img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png', 'fart.mp3'],
+      matches: ['<all_urls>'],
     },
   ],
-  permissions: ['sidePanel', 'storage'],
+  permissions: ['alarms', 'tabs', 'sidePanel', 'storage'],
+  host_permissions: ['<all_urls>'],
   chrome_url_overrides: {
     newtab: 'newtab.html',
   },

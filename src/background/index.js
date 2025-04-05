@@ -1,3 +1,5 @@
+console.log("running script");
+
 // Sample websites to block
 const blockedSites = ["youtube.com", "reddit.com", "twitter.com"];
 
@@ -16,9 +18,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
         //
         if (blockedSites.some(site => tab.url.includes(site))) {
           console.log("You're on a blocked site!!!");
-        }
-        else {
-          console.log("you're safe!");
+
+          // Send to context to play sound
+          chrome.runtime.sendMessage({ action: "playSound" });
         }
       }
     });
