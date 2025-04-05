@@ -26,7 +26,7 @@ export default defineManifest({
   },
   content_scripts: [
     {
-      matches: ['http://*/*', 'https://*/*'],
+      matches: ['<all_urls>'],
       js: ['src/contentScript/index.js'],
     },
   ],
@@ -35,11 +35,11 @@ export default defineManifest({
   },
   web_accessible_resources: [
     {
-      resources: ['img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png'],
-      matches: [],
+      resources: ['img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png', 'fart.mp3'],
+      matches: ['<all_urls>'],
     },
   ],
-  permissions: ['sidePanel', 'storage', 'tabs'],
+  permissions: ['alarms', 'tabs', 'sidePanel', 'storage', 'tabs'],
   host_permissions: ['<all_urls>'],
   chrome_url_overrides: {
     newtab: 'newtab.html',
