@@ -20,7 +20,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           console.log("You're on a blocked site!!!");
 
           // Send to context to play sound
-          chrome.runtime.sendMessage({ action: "playSound" });
+          chrome.tabs.sendMessage(tab.id, { action: "playSound" });
         }
       }
     });
