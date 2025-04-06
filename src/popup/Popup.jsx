@@ -7,6 +7,8 @@ export const Popup = () => {
   const { user, isLoading, logout } = useUser();
   const { friends, loading: loadingFriends } = useFriends(user);
 
+  console.log("use friends:", friends);
+
   // Make sure user is logged in, otherwise direct to login/signup
   useEffect(() => {
     if (!isLoading && !user) {
@@ -35,7 +37,7 @@ export const Popup = () => {
         <ul>
           {friends.map((f) => (
             <li key={f.id}>
-              {f.users?.username || f.users?.email || 'Unknown User'}{' '}
+              {f.user?.username || f.user?.email || 'Unknown User'}{' '}
               {f.status === 'pending' ? '(Pending)' : ''}
             </li>
           ))}
