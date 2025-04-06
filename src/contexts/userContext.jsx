@@ -114,6 +114,8 @@ export function UserProvider({ children }) {
         throw new Error('Logout failed');
       }
 
+      await chrome.storage.local.remove('authToken');
+
       setUser(null);
       return true;
     } catch (error) {

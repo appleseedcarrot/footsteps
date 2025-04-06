@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
           popup: 'popup.html',
           login: 'login.html',
           signup: 'signup.html',
+          friends: 'friends.html',
         },
         output: {
           chunkFileNames: 'assets/chunk-[hash].js',
