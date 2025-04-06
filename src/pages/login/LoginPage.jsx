@@ -9,7 +9,7 @@ export default function LoginPage() {
   const handleLogin = async () => {
     try {
       await login(email, password);
-      window.close(); // Or redirect to popup
+      window.location.href = chrome.runtime.getURL('popup.html');
     } catch (err) {
       console.error('Login failed', err);
     }

@@ -187,6 +187,7 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     checkAuth();
+    console.log(user);
   }, []);
 
   const contextValue = {
