@@ -17,22 +17,25 @@ export const Popup = () => {
     }
   }, [user, isLoading]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!user) return <div>Redirecting to login...</div>;
+  if (isLoading) return <div className="loading">Loading...</div>;
+  if (!user) return <div className="loading">Redirecting to login...</div>;
 
   return (
     <main>
-      <button className="settings"></button>
-      <h3>SNITCH</h3>
-      <div className="calc">
+      <h1>You should be studying...</h1>
+      
+      <div className="toggle-container">
         <ToggleSwitch />
       </div>
-      <h1>You should be studying...</h1>
-      <ToggleSwitch />
-
-      <h3 style={{ marginTop: '1rem' }}>👯 Friends</h3>
-      {friends.length === 0 ? (
-        <p>You don’t have any friends yet.</p>
+      
+      <h3>
+        <span role="img" aria-label="Friends">👯</span> Friends
+      </h3>
+      
+      {loadingFriends ? (
+        <p>Loading friends...</p>
+      ) : friends.length === 0 ? (
+        <p>You don't have any friends yet.</p>
       ) : (
         <ul>
           {friends.map((f) => (
@@ -44,18 +47,7 @@ export const Popup = () => {
         </ul>
       )}
       
-      <button
-        onClick={logout}
-        style={{
-          marginTop: '1rem',
-          padding: '0.5rem 1rem',
-          backgroundColor: '#ef4444',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-        }}
-      >
+      <button className="logout" onClick={logout}>
         Log Out
       </button>
     </main>
