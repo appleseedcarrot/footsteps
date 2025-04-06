@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from 'react'
-import { useUser } from '@/contexts/userContext';
+import { useState, useEffect, useContext } from 'react';
+import ToggleSwitch from '../toggleSwitch/ToggleSwitch'import { useUser } from '@/contexts/userContext';
 
 import './Popup.css'
 
@@ -12,9 +12,10 @@ export const Popup = () => {
 
   return (
     <main>
-      <div> Logged in </div>
+      <h1>You should be studying...</h1>
+      <ToggleSwitch />
     </main>
-  )
+  );
 }
 
-export default Popup
+export default Popup;
