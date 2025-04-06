@@ -94,7 +94,7 @@ const startPinging = () => {
         resolve(result.authToken);
       });
     });
-
+    
     if (!token) { return; }
 
     // update status online
