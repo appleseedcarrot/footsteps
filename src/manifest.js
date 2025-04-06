@@ -35,7 +35,7 @@ export default defineManifest({
   },
   web_accessible_resources: [
     {
-      resources: ['img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png', 'fart.mp3'],
+      resources: ['img/logo-16.png', 'img/logo-32.png', 'img/logo-48.png', 'img/logo-128.png', 'fart.mp3', 'footsteps.mp3'],
       matches: ['<all_urls>'],
     },
   ],
