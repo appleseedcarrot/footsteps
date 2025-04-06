@@ -46,6 +46,24 @@ export const Popup = () => {
           ))}
         </ul>
       )}
+
+      <button
+        onClick={() => {
+          const url = chrome.runtime.getURL('friends.html');
+          window.open(url, '_blank');
+        }}
+        style={{
+          marginTop: '1rem',
+          padding: '0.5rem 1rem',
+          backgroundColor: '#3b82f6',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        Manage Friends
+      </button>
       
       <button className="logout" onClick={logout}>
         Log Out

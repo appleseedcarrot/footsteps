@@ -83,20 +83,41 @@ chrome.alarms.onAlarm.addListener((alarm) => {
       }
     });
   }
-
-  // // Ping backend to update online status
-  // setInterval(async () => {
-  //   const token = await new Promise((resolve) => {
-  //     chrome.storage.local.get(['authToken'], (result) => {
-  //       resolve(result.authToken);
-  //     });
-  //   });
-  //   fetch(`${import.meta.env.VITE_BACKEND_URL}/ping`, {
-  //     method: 'POST',
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   });
-  // }, 15 * 1000); // every 15 seconds
 });
+
+const startPinging = () => {
+
+  // grab token
+  const loop = async () => {
+    const token = await new Promise((resolve) => {
+      chrome.storage.local.get(['authToken'], (result) => {
+        resolve(result.authToken);
+      });
+    });
+
+    if (!token) { return; }
+
+    // update status online
+    const url = `${import.meta.env.VITE_APP_BACKEND_URL}auth/ping`;
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      console.log('[PING] Response:', data);
+    } catch (err) {
+      console.error('[PING] Error:', err.message || err);
+    }
+
+    setTimeout(loop, 1500); // schedule the next ping only after this one is done
+  };
+
+  loop(); // start
+};
+
+startPinging();
 
