@@ -146,21 +146,18 @@ const startPollingJumpscares = () => {
     if (!token) return;
 
     try {
-
-      console.log
       const res = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/jumpscare/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
-
-      if (data && data.id) {
+      
+      if (data.length > 0) {
         console.log('JUMPSCARE INCOMING:', data);
         checkIfOnBlockedSite(true);
+        return;
       }
-      else {
-        console.log('no jumpscares');
-      }
+
     } catch (err) {
       console.error('Polling error:', err);
     }
