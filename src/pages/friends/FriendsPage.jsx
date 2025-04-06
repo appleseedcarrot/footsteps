@@ -25,7 +25,7 @@ export default function FriendsPage() {
     }
   
     if (email === user.email) {
-      setMessage("You can't friend yourself 🫠");
+      setMessage("You can't friend yourself");
       return;
     }
   
@@ -101,11 +101,13 @@ export default function FriendsPage() {
       <h2>Pending Requests</h2>
       <ul>
         {friends
-          .filter((f) => f.status === 'pending' && !f.isSender)
+          .filter((f) => f.status === 'pending')
           .map((f) => (
             <li key={f.id}>
               {f.user.email}{' '}
-              <button onClick={() => handleAccept(f.friendId)}>Accept</button>
+              {!f.isSender && (
+                <button onClick={() => handleAccept(f.friendId)}>Accept</button>
+              )}
             </li>
           ))}
       </ul>

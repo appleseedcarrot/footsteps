@@ -38,6 +38,7 @@ export const useFriends = (user) => {
             status: entry.status,
             user: otherUser,
             friendId: friendId,
+            isSender,
           };
         });
 
