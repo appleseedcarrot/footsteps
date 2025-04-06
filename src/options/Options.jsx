@@ -23,7 +23,7 @@ export const Options = () => {
     }
     
     if (blocklist.includes(trimmed)) {
-      setInputError('This site is already blocked')
+      setInputError('This site has already been added')
       return
     }
 
