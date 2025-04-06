@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
-import ToggleSwitch from '../toggleSwitch/ToggleSwitch'import { useUser } from '@/contexts/userContext';
+import ToggleSwitch from '../toggleSwitch/ToggleSwitch';
+import { useUser } from '@/contexts/userContext';
 
 import './Popup.css'
 
