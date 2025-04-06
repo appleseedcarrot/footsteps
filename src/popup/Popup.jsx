@@ -20,6 +20,8 @@ export const Popup = () => {
 
   return (
     <main>
+      <h1>You should be studying...</h1>
+
       <button className="settings"></button>
       <h3>SNITCH</h3>
       <div className="calc">
