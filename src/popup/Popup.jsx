@@ -39,12 +39,28 @@ export const Popup = () => {
         <p>You don't have any friends yet.</p>
       ) : (
         <ul>
-          {friends.map((f) => (
-            <li key={f.id}>
-              {f.user?.username || f.user?.email || 'Unknown User'}{' '}
-              {f.status === 'pending' ? '(Pending)' : ''}
-            </li>
-          ))}
+          {friends.map((f) => {
+            const lastSeen = f.user?.last_seen;
+            const isOnline = lastSeen && (new Date() - new Date(lastSeen)) < 30 * 1000;
+
+            return (
+              <li key={f.id}>
+                {f.user?.username || f.user?.email || 'Unknown User'}
+                <span
+                  style={{
+                    display: 'inline-block',
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: isOnline ? 'green' : 'gray',
+                    marginLeft: 6,
+                  }}
+                  title={isOnline ? 'Online' : 'Offline'}
+                />
+                {f.status === 'pending' ? ' (Pending)' : ''}
+              </li>
+            );
+          })}
         </ul>
       )}
 
