@@ -1,7 +1,23 @@
+
 console.log("running script");
 
+
+// Get the initial blocked sites set in options
+let blockedSites = []
+
+chrome.storage.sync.get({ blocklist: [] }, ({ blocklist }) => {
+  blockedSites = blocklist
+})
+
+// Listener for blocklist (if user updates blocklist)
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === "sync" && changes.blocklist) {
+    blockedSites = changes.blocklist.newValue
+  }
+})
+  
 // Sample websites to block
-const blockedSites = ["youtube.com", "reddit.com", "twitter.com"];
+// const blockedSites = ["youtube.com", "reddit.com", "twitter.com"];
 
 // Add listener to check every 5 minutes
 chrome.runtime.onInstalled.addListener(() => {
