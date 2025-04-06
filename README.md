@@ -1,5 +1,6 @@
 # snitch
 > by Bethany Cho, Christian Lee, Grace Shum, and Chester Wonchoba for WildHacks 2025
+> 
 > a chrome extension tools built with Vite + React, and Manifest v3
 
 ## Credits
