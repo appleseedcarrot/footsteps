@@ -574,6 +574,388 @@ function initGlitch() {
 
 
 
+// Add these functions to distort the underlying webpage content
+
+// Variables to store the distortion state
+let distortionInterval = null;
+let originalStyles = new Map();
+let distortedElements = [];
+
+// Function to start distorting the webpage
+function startWebpageDistortion() {
+  // Store the original state of elements for restoration later
+  storeOriginalStyles();
+  
+  // Apply initial distortion to elements
+  distortPageElements();
+  
+  // Start continuous distortion
+  startDistortionInterval();
+}
+
+// Function to stop distorting and restore the webpage
+function stopWebpageDistortion() {
+  // Clear the distortion interval
+  if (distortionInterval) {
+    clearInterval(distortionInterval);
+    distortionInterval = null;
+  }
+  
+  // Restore original styles
+  restoreOriginalStyles();
+}
+
+// Store original styles of elements to restore later
+function storeOriginalStyles() {
+  originalStyles.clear();
+  distortedElements = [];
+  
+  // Select important elements to distort
+  const elements = document.querySelectorAll('div, p, h1, h2, h3, h4, h5, img, a, button, input, section, article');
+  
+  elements.forEach(el => {
+    // Skip very small elements or invisible elements
+    if (el.offsetWidth < 10 || el.offsetHeight < 10 || 
+        window.getComputedStyle(el).display === 'none' ||
+        window.getComputedStyle(el).visibility === 'hidden') {
+      return;
+    }
+    
+    // Store original styles
+    originalStyles.set(el, {
+      transform: el.style.transform || '',
+      filter: el.style.filter || '',
+      position: el.style.position || '',
+      zIndex: el.style.zIndex || '',
+      transition: el.style.transition || '',
+      opacity: el.style.opacity || '',
+      color: el.style.color || '',
+      backgroundColor: el.style.backgroundColor || '',
+      overflow: el.style.overflow || '',
+      left: el.style.left || '',
+      top: el.style.top || '',
+      width: el.style.width || '',
+      height: el.style.height || '',
+      borderRadius: el.style.borderRadius || '',
+      letterSpacing: el.style.letterSpacing || '',
+      textShadow: el.style.textShadow || ''
+    });
+    
+    distortedElements.push(el);
+  });
+  
+  console.log(`Stored original styles for ${distortedElements.length} elements`);
+}
+
+// Restore the original styles
+function restoreOriginalStyles() {
+  distortedElements.forEach(el => {
+    if (originalStyles.has(el)) {
+      const styles = originalStyles.get(el);
+      
+      // Restore all stored properties
+      for (const [prop, value] of Object.entries(styles)) {
+        el.style[prop] = value;
+      }
+    }
+  });
+  
+  // Also restore any text nodes we might have distorted
+  restoreTextNodes();
+}
+
+// Initialize and store original text nodes
+let originalTextNodes = new Map();
+function storeTextNodes() {
+  originalTextNodes.clear();
+  
+  // Find text nodes in the document
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    null,
+    false
+  );
+  
+  let node;
+  while (node = walker.nextNode()) {
+    // Only store non-empty text nodes in visible elements
+    if (node.nodeValue.trim() !== '' && isNodeVisible(node)) {
+      originalTextNodes.set(node, node.nodeValue);
+    }
+  }
+}
+
+// Check if a node is visible
+function isNodeVisible(node) {
+  if (!node.parentElement) return false;
+  const style = window.getComputedStyle(node.parentElement);
+  return style.display !== 'none' && style.visibility !== 'hidden';
+}
+
+// Restore original text nodes
+function restoreTextNodes() {
+  originalTextNodes.forEach((value, node) => {
+    if (node.nodeValue !== value) {
+      node.nodeValue = value;
+    }
+  });
+}
+
+// Apply distortion to page elements
+function distortPageElements() {
+  // Get viewport dimensions
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  distortedElements.forEach(el => {
+    // Different distortion based on element type
+    if (el.tagName === 'IMG') {
+      distortImage(el);
+    } else if (el.tagName.match(/^H[1-6]$/)) {
+      distortHeading(el);
+    } else if (el.tagName === 'P' || el.textContent.length > 20) {
+      distortTextBlock(el);
+    } else {
+      distortGenericElement(el);
+    }
+    
+    // Occasionally add extra glitchy effects
+    if (Math.random() > 0.9) {
+      applyGlitchEffects(el);
+    }
+  });
+  
+  // Distort some text nodes
+  distortTextNodes();
+}
+
+// Distort image elements
+function distortImage(element) {
+  const distortionAmount = Math.random() * 20;
+  const filterValues = [
+    `hue-rotate(${Math.random() * 180}deg)`,
+    `invert(${Math.random() * 0.7})`,
+    `saturate(${1 + Math.random() * 3})`,
+    `contrast(${1 + Math.random()})`,
+    `blur(${Math.random() * 2}px)`
+  ];
+  
+  // Apply random distortion
+  element.style.transform = `skew(${Math.random() * 10 - 5}deg, ${Math.random() * 10 - 5}deg) scale(${0.9 + Math.random() * 0.2})`;
+  element.style.filter = filterValues.join(' ');
+  
+  // Random positioning changes
+  if (Math.random() > 0.5) {
+    if (element.style.position !== 'fixed' && element.style.position !== 'absolute') {
+      element.style.position = 'relative';
+    }
+    element.style.left = `${Math.random() * 20 - 10}px`;
+    element.style.top = `${Math.random() * 20 - 10}px`;
+  }
+  
+  // Set transition for smooth/glitchy movement
+  element.style.transition = `transform ${0.1 + Math.random() * 0.2}s, filter ${0.1 + Math.random() * 0.2}s`;
+}
+
+// Distort heading elements
+function distortHeading(element) {
+  // Randomize text properties
+  element.style.letterSpacing = `${Math.random() * 4 - 2}px`;
+  element.style.transform = `skew(${Math.random() * 5 - 2.5}deg) rotate(${Math.random() * 2 - 1}deg)`;
+  
+  // Occasionally add text shadow for glitch effect
+  if (Math.random() > 0.7) {
+    const textShadows = [
+      `${Math.random() * 4 - 2}px ${Math.random() * 4 - 2}px 0px rgba(255,0,0,0.7)`,
+      `${Math.random() * 4 - 2}px ${Math.random() * 4 - 2}px 0px rgba(0,0,255,0.7)`
+    ];
+    element.style.textShadow = textShadows.join(', ');
+  }
+  
+  // Random color changes
+  if (Math.random() > 0.7) {
+    element.style.color = getRandomDistortedColor();
+  }
+  
+  // Set transition for smooth/glitchy movement
+  element.style.transition = `all ${0.1 + Math.random() * 0.3}s`;
+}
+
+// Distort text blocks like paragraphs
+function distortTextBlock(element) {
+  // Subtle distortion for readability
+  element.style.transform = `skew(${Math.random() * 3 - 1.5}deg)`;
+  
+  // Occasional letter spacing changes
+  if (Math.random() > 0.7) {
+    element.style.letterSpacing = `${Math.random() * 2 - 1}px`;
+  }
+  
+  // Random text effects
+  if (Math.random() > 0.8) {
+    element.style.filter = `blur(${Math.random() * 0.5}px)`;
+  }
+  
+  // Set transition for smooth/glitchy movement
+  element.style.transition = `all ${0.2 + Math.random() * 0.3}s`;
+}
+
+// Distort generic elements
+function distortGenericElement(element) {
+  const translateX = Math.random() * 20 - 10;
+  const translateY = Math.random() * 20 - 10;
+  const rotate = Math.random() * 5 - 2.5;
+  const skewX = Math.random() * 10 - 5;
+  const skewY = Math.random() * 10 - 5;
+  
+  // Apply random transforms
+  element.style.transform = `translate(${translateX}px, ${translateY}px) rotate(${rotate}deg) skew(${skewX}deg, ${skewY}deg)`;
+  
+  // Sometimes change the element's dimensions slightly
+  if (Math.random() > 0.8) {
+    const scaleFactor = 0.95 + Math.random() * 0.1;
+    element.style.transform += ` scale(${scaleFactor})`;
+  }
+  
+  // Random opacity changes
+  if (Math.random() > 0.8) {
+    element.style.opacity = 0.7 + Math.random() * 0.3;
+  }
+  
+  // Occasionally add a filter
+  if (Math.random() > 0.8) {
+    element.style.filter = `contrast(${1 + Math.random() * 0.3}) brightness(${0.9 + Math.random() * 0.2})`;
+  }
+  
+  // Set transition for smooth/glitchy movement
+  element.style.transition = `all ${0.1 + Math.random() * 0.2}s`;
+}
+
+// Apply extra glitchy effects to an element
+function applyGlitchEffects(element) {
+  const effect = Math.floor(Math.random() * 5);
+  
+  switch (effect) {
+    case 0: // Color shifting
+      element.style.filter = `hue-rotate(${Math.random() * 360}deg) saturate(${1 + Math.random() * 3})`;
+      break;
+      
+    case 1: // Extreme skewing
+      element.style.transform += ` skew(${Math.random() * 30 - 15}deg, ${Math.random() * 30 - 15}deg)`;
+      break;
+      
+    case 2: // Extreme displacement
+      if (element.style.position !== 'fixed' && element.style.position !== 'absolute') {
+        element.style.position = 'relative';
+      }
+      element.style.left = `${Math.random() * 40 - 20}px`;
+      element.style.top = `${Math.random() * 40 - 20}px`;
+      break;
+      
+    case 3: // Flip or rotate
+      element.style.transform += ` rotateY(${Math.random() > 0.5 ? '180deg' : '0deg'}) rotateX(${Math.random() > 0.5 ? '180deg' : '0deg'})`;
+      break;
+      
+    case 4: // Extreme blur and contrast
+      element.style.filter = `blur(${Math.random() * 3}px) contrast(${1 + Math.random() * 2})`;
+      break;
+  }
+}
+
+// Get a random distorted color
+function getRandomDistortedColor() {
+  const colors = [
+    '#ff0000', // Red
+    '#ff00ff', // Magenta
+    '#0000ff', // Blue
+    '#00ffff', // Cyan
+    '#ffffff', // White
+    '#000000'  // Black
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// Distort text nodes for even more glitchy appearance
+function distortTextNodes() {
+  // Store original text if we haven't already
+  if (originalTextNodes.size === 0) {
+    storeTextNodes();
+  }
+  
+  // Only distort some text nodes to maintain partial readability
+  originalTextNodes.forEach((originalText, node) => {
+    // Random chance to distort this specific node
+    if (Math.random() > 0.9) {
+      const distortType = Math.floor(Math.random() * 4);
+      
+      switch (distortType) {
+        case 0: // Character replacement
+          node.nodeValue = distortWithRandomChars(originalText);
+          break;
+        case 1: // Reverse text
+          node.nodeValue = originalText.split('').reverse().join('');
+          break;
+        case 2: // Case change
+          node.nodeValue = Math.random() > 0.5 ? 
+            originalText.toUpperCase() : originalText.toLowerCase();
+          break;
+        case 3: // Letter spacing (HTML might not work in text nodes)
+          // Just scramble a bit
+          node.nodeValue = scrambleText(originalText);
+          break;
+      }
+    }
+  });
+}
+
+// Replace some characters with random ones
+function distortWithRandomChars(text) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+  return text.split('').map(char => {
+    return Math.random() > 0.9 ? chars.charAt(Math.floor(Math.random() * chars.length)) : char;
+  }).join('');
+}
+
+// Scramble parts of text
+function scrambleText(text) {
+  // Split into words
+  const words = text.split(' ');
+  
+  // Scramble some words
+  return words.map(word => {
+    if (word.length > 3 && Math.random() > 0.8) {
+      // Keep first and last letter, scramble middle
+      const first = word[0];
+      const last = word[word.length - 1];
+      const middle = word.substring(1, word.length - 1).split('');
+      
+      // Shuffle middle letters
+      for (let i = middle.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [middle[i], middle[j]] = [middle[j], middle[i]];
+      }
+      
+      return first + middle.join('') + last;
+    }
+    return word;
+  }).join(' ');
+}
+
+// Start continuous distortion interval
+function startDistortionInterval() {
+  // Clear any existing interval
+  if (distortionInterval) {
+    clearInterval(distortionInterval);
+  }
+  
+  // Create new interval that regularly updates distortions
+  distortionInterval = setInterval(() => {
+    distortPageElements();
+  }, 1000); // Update every second
+}
+
+// Modify your existing activate/deactivate functions to include webpage distortion
 function activateGlitch() {
   // Initialize if not already done
   if (!overlayElement) {
@@ -587,6 +969,9 @@ function activateGlitch() {
   // Start animations
   startGlitchAnimations();
   
+  // Start distorting the webpage itself
+  startWebpageDistortion();
+  
   console.log("Glitch effect activated");
 }
 
@@ -599,6 +984,9 @@ function deactivateGlitch() {
   
   // Stop animations
   stopGlitchAnimations();
+  
+  // Stop distorting the webpage and restore it
+  stopWebpageDistortion();
   
   console.log("Glitch effect deactivated");
 }
