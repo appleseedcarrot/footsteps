@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useUser } from '@/contexts/userContext';
 import { useFriends } from '../hooks/useFriends';
 import ToggleSwitch from '../toggleSwitch/ToggleSwitch';
+import '../popup/Popup.css'
 
 export const Popup = () => {
   const { user, isLoading, logout } = useUser();
@@ -29,7 +30,7 @@ export const Popup = () => {
       </div>
       
       <h3>
-        <span role="img" aria-label="Friends">👯</span> Friends
+        Friends
       </h3>
       
       {loadingFriends ? (
