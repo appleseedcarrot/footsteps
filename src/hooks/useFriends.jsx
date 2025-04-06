@@ -19,10 +19,30 @@ export const useFriends = (user) => {
           },
         });
 
-        const data = await res.json();
-        setFriends(data || []);
+        const rawData = await res.json();
+
+        if (!Array.isArray(rawData)) {
+          console.warn('[useFriends] Invalid data:', rawData);
+          setFriends([]);
+          return;
+        }
+
+        // Parse friend data: determine which user is the actual friend
+        const parsed = rawData.map((entry) => {
+          const isSender = entry.user_id === user.id;
+          const otherUser = isSender ? entry.recipient : entry.requester;
+
+          return {
+            id: entry.id,
+            status: entry.status,
+            user: otherUser,
+          };
+        });
+
+        setFriends(parsed);
       } catch (err) {
         console.error('Failed to fetch friends:', err);
+        setFriends([]);
       } finally {
         setLoading(false);
       }
