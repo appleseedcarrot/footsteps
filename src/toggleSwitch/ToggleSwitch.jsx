@@ -11,7 +11,7 @@ const ToggleSwitch = () => {
     return (
         <button onClick={handleToggle}>
             {isToggled ? 'ON' : 'OFF'}
-        </button>
+        </button> 
     );
 };
 
