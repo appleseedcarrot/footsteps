@@ -270,14 +270,17 @@ function initGlitch() {
 }
 
 chrome.runtime.onMessage.addListener((message) => {
-    console.log('Message received for sound');
-    if (message.action === "playSound") {
-      const audio = new Audio(chrome.runtime.getURL("footsteps.mp3"));
-      audio.play();
+  console.log('Message received:', message.action);
 
-      freezeScreen();
-      activateGlitch();
-    }
+  if (message.action === "playSound") {
+    const audio = new Audio(chrome.runtime.getURL("footsteps.mp3"));
+    audio.play();
+
+    freezeScreen(); // just freeze screen on sound (optional)
+  }
+
+  if (message.action === "JUMPSCARE") {
+    activateGlitch(); // start glitch visuals + face
+  }
 });
-
 window.addEventListener('load', initGlitch);

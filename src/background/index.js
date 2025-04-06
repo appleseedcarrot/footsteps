@@ -64,21 +64,21 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 //   chrome.alarms.create("checkTab", { periodInMinutes: checkInterval });
 // });
 
-const checkIfOnBlockedSite = (glitchEnabled = false) => {
-  chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-    const tab = tabs[0];
-    if (tab && tab.url) {
-      if (blockedSites.some((site) => tab.url.includes(site))) {
-        console.log("You're on a blocked site!!!");
+// const checkIfOnBlockedSite = (glitchEnabled = false) => {
+//   chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+//     const tab = tabs[0];
+//     if (tab && tab.url) {
+//       if (blockedSites.some((site) => tab.url.includes(site))) {
+//         console.log("You're on a blocked site!!!");
 
-        chrome.tabs.sendMessage(tab.id, {
-          action: "playSound",
-          glitchEnabled: glitchEnabled,
-        });
-      }
-    }
-  });
-};
+//         chrome.tabs.sendMessage(tab.id, {
+//           action: "playSound",
+//           glitchEnabled: glitchEnabled,
+//         });
+//       }
+//     }
+//   });
+// };
 
 // Listener for alarm
 // chrome.alarms.onAlarm.addListener((alarm) => {
@@ -151,13 +151,38 @@ const startPollingJumpscares = () => {
       });
 
       const data = await res.json();
-      
+
       if (data.length > 0) {
         console.log('JUMPSCARE INCOMING:', data);
-        checkIfOnBlockedSite(true);
+
+        // Play footsteps
+        chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+          const tab = tabs[0];
+          if (!tab || !tab.url) return;
+
+          chrome.tabs.sendMessage(tab.id, { action: "playSound" });
+
+          // Wait 5s then check if user is still on a blocked site
+          setTimeout(() => {
+            chrome.tabs.query({ active: true, lastFocusedWindow: true }, (checkTabs) => {
+              const currentTab = checkTabs[0];
+
+              if (
+                currentTab &&
+                currentTab.id === tab.id &&
+                blockedSites.some((site) => currentTab.url.includes(site))
+              ) {
+                // STILL on blocked site = send jumpscare
+                chrome.tabs.sendMessage(currentTab.id, { action: "JUMPSCARE", data });
+              } else {
+                console.log("User escaped the jumpscare 👀");
+              }
+            });
+          }, 5000);
+        });
+
         return;
       }
-
     } catch (err) {
       console.error('Polling error:', err);
     }
