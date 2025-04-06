@@ -5,6 +5,7 @@ import { useFriends } from '@/hooks/useFriends'; // Assuming it's in hooks folde
 export default function FriendsPage() {
   const { user } = useUser();
   const { friends, loading } = useFriends(user);
+  console.log('your friends', friends);
 
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
@@ -104,7 +105,7 @@ export default function FriendsPage() {
           .map((f) => (
             <li key={f.id}>
               {f.user.email}{' '}
-              <button onClick={() => handleAccept(f.user.id)}>Accept</button>
+              <button onClick={() => handleAccept(f.friendId)}>Accept</button>
             </li>
           ))}
       </ul>

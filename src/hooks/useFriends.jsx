@@ -31,11 +31,13 @@ export const useFriends = (user) => {
         const parsed = rawData.map((entry) => {
           const isSender = entry.user_id === user.id;
           const otherUser = isSender ? entry.recipient : entry.requester;
-
+          const friendId = isSender ? entry.friend_id : entry.user_id;
+          
           return {
             id: entry.id,
             status: entry.status,
             user: otherUser,
+            friendId: friendId,
           };
         });
 

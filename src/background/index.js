@@ -98,7 +98,7 @@ const startPinging = () => {
     if (!token) { return; }
 
     // update status online
-    const url = `${import.meta.env.VITE_APP_BACKEND_URL}auth/ping`;
+    const url = `${import.meta.env.VITE_APP_BACKEND_URL}/auth/ping`;
     try {
       const res = await fetch(url, {
         method: 'POST',
