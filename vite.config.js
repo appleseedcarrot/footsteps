@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import { crx } from '@crxjs/vite-plugin'
 import react from '@vitejs/plugin-react'
 import manifest from './src/manifest.js'
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -10,6 +11,11 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       outDir: 'build',
       rollupOptions: {
+        input: {
+          popup: 'popup.html',
+          login: 'login.html',
+          signup: 'signup.html',
+        },
         output: {
           chunkFileNames: 'assets/chunk-[hash].js',
         },
@@ -20,5 +26,10 @@ export default defineConfig(({ mode }) => {
     legacy: {
       skipWebSocketTokenCheck: true,
     },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src')
+      }
+    }
   }
 })

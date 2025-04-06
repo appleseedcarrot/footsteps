@@ -8,7 +8,6 @@ const DEFAULT_SETTINGS = {
   checkIntervalMinutes: 0.1 // 6 seconds
 };
 
-
 // Get the initial blocked sites set in options
 let blockedSites = []
 let glitchEnabled = true;
@@ -32,11 +31,6 @@ function updateCheckInterval() {
     chrome.alarms.create("checkTab", { periodInMinutes: checkInterval });
   });
 }
-
-
-// chrome.storage.sync.get({ blocklist: [] }, ({ blocklist }) => {
-//   blockedSites = blocklist
-// })
 
 // Initial settings load
 loadSettings();
@@ -89,5 +83,20 @@ chrome.alarms.onAlarm.addListener((alarm) => {
       }
     });
   }
+
+  // // Ping backend to update online status
+  // setInterval(async () => {
+  //   const token = await new Promise((resolve) => {
+  //     chrome.storage.local.get(['authToken'], (result) => {
+  //       resolve(result.authToken);
+  //     });
+  //   });
+  //   fetch(`${import.meta.env.VITE_BACKEND_URL}/ping`, {
+  //     method: 'POST',
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   });
+  // }, 15 * 1000); // every 15 seconds
 });
 
