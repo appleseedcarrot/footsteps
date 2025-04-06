@@ -51,6 +51,7 @@ h1 {
 }
 
 h3 {
+<<<<<<< HEAD
   font-size: 1.125rem;
   font-weight: 500;
   color: var(--accent);
@@ -125,6 +126,66 @@ button.logout:hover {
   height: 300px;
   font-size: 1rem;
   color: var(--text-light);
+=======
+  color: #61dafb;
+  text-transform: uppercase;
+  font-family: cursive;
+  font: bold; 
+  font-size: 1.5rem;
+  font-weight: 200;
+  line-height: 1.2rem;
+  margin: 2rem auto;
+}
+
+.settings {
+  display: inline;
+  justify-content: left;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-image: url('../assets/settings.png');
+  background-size: cover;
+  background-position: center;
+  background-color: transparent;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+.settings:hover {
+  opacity: 50%;
+}
+
+.calc {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem;
+
+  & > button {
+    font-size: 1rem;
+    font-family: cursive;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: rgb(54, 53, 53);
+    color: white;
+    cursor: pointer;
+    outline: none;
+
+    width: 3rem;
+    margin: 0 a;
+  }
+
+  & > label {
+    font-size: 1.5rem;
+    margin: 0 1rem;
+  }
+>>>>>>> d365d64 (pop-up button edit)
 }
 
 /* Toggle switch container */
