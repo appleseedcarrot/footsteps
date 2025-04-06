@@ -6,6 +6,7 @@
 1. Scary face image: https://en.picmix.com/stamp/face-2473094
 2. Footsteps sound: Pixabay - https://pixabay.com/sound-effects/search/footsteps/
 3. Piano sound: Erix L. L. Oliver - https://youtu.be/cTpuWjik1GE
+4. Google Extension Template: guocaoyi https://github.com/guocaoyi/create-chrome-ext
 
 ## Installing
 
