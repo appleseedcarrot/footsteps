@@ -96,7 +96,7 @@ export const Popup = () => {
         style={{
           marginTop: '1rem',
           padding: '0.5rem 1rem',
-          backgroundColor: '#3b82f6',
+          backgroundColor: 'rgb(41, 41, 41)',
           color: '#fff',
           border: 'none',
           borderRadius: '5px',

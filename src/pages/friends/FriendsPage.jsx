@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUser } from '@/contexts/userContext';
 import { useFriends } from '@/hooks/useFriends'; // Assuming it's in hooks folder
-
+import '../friends/FriendsPage.css'
 export default function FriendsPage() {
   const { user } = useUser();
   const { friends, loading } = useFriends(user);
@@ -81,38 +81,42 @@ export default function FriendsPage() {
   };
 
   return (
-    <div style={{ padding: '1rem', maxWidth: '400px', margin: '0 auto' }}>
+    <div className="friends-container">
       <h1>Friends</h1>
-
-      {message && <div style={{ color: 'green', marginBottom: '1rem' }}>{message}</div>}
-
-      <div style={{ marginBottom: '1rem' }}>
+  
+      {message && <div className="message">{message}</div>}
+  
+      <div className="input-group">
         <input
           placeholder="Friend's email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem' }}
         />
-        <button onClick={handleRequest} style={{ marginTop: '0.5rem', width: '100%' }}>
+        <button className="button" onClick={handleRequest}>
           Send Friend Request
         </button>
       </div>
-
-      <h2>Pending Requests</h2>
+  
+      <h3>Pending Requests</h3>
       <ul>
         {friends
           .filter((f) => f.status === 'pending')
           .map((f) => (
             <li key={f.id}>
-              {f.user.email}{' '}
+              {f.user.email}
               {!f.isSender && (
-                <button onClick={() => handleAccept(f.friendId)}>Accept</button>
+                <button
+                  className="accept-button"
+                  onClick={() => handleAccept(f.friendId)}
+                >
+                  Accept
+                </button>
               )}
             </li>
           ))}
       </ul>
-
-      <h2>Friends</h2>
+  
+      <h3>Friends</h3>
       <ul>
         {friends
           .filter((f) => f.status === 'accepted')

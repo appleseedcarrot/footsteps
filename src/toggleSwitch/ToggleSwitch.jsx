@@ -9,9 +9,20 @@ const ToggleSwitch = () => {
     };
     
     return (
-        <button onClick={handleToggle}>
-            {isToggled ? 'ON' : 'OFF'}
-        </button> 
+        <div className="toggle-switch-container">
+            <button
+                className={`toggle-option ${isToggled ? 'active' : ''}`}
+                onClick={() => setToggle(true)}
+            >
+                ON
+            </button>
+            <button
+                className={`toggle-option ${!isToggled ? 'active' : ''}`}
+                onClick={() => setToggle(false)}
+            >
+                OFF
+            </button>
+        </div>
     );
 };
 
