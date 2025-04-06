@@ -59,31 +59,47 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 });
 
-// Add listener to check on the set interval
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.alarms.create("checkTab", { periodInMinutes: checkInterval });
-});
+// // Add listener to check on the set interval
+// chrome.runtime.onInstalled.addListener(() => {
+//   chrome.alarms.create("checkTab", { periodInMinutes: checkInterval });
+// });
+
+const checkIfOnBlockedSite = (glitchEnabled = false) => {
+  chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    if (tab && tab.url) {
+      if (blockedSites.some((site) => tab.url.includes(site))) {
+        console.log("You're on a blocked site!!!");
+
+        chrome.tabs.sendMessage(tab.id, {
+          action: "playSound",
+          glitchEnabled: glitchEnabled,
+        });
+      }
+    }
+  });
+};
 
 // Listener for alarm
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "checkTab") {
-    chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-      const tab = tabs[0];
-      if (tab && tab.url) {
-        // Check if user is on a blocked site
-        if (blockedSites.some(site => tab.url.includes(site))) {
-          console.log("You're on a blocked site!!!");
+// chrome.alarms.onAlarm.addListener((alarm) => {
+//   if (alarm.name === "checkTab") {
+//     chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+//       const tab = tabs[0];
+//       if (tab && tab.url) {
+//         // Check if user is on a blocked site
+//         if (blockedSites.some(site => tab.url.includes(site))) {
+//           console.log("You're on a blocked site!!!");
 
-          // Send to content script to play sound and activate glitch
-          chrome.tabs.sendMessage(tab.id, { 
-            action: "playSound",
-            glitchEnabled: glitchEnabled
-          });
-        }
-      }
-    });
-  }
-});
+//           // Send to content script to play sound and activate glitch
+//           chrome.tabs.sendMessage(tab.id, { 
+//             action: "playSound",
+//             glitchEnabled: glitchEnabled
+//           });
+//         }
+//       }
+//     });
+//   }
+// });
 
 const startPinging = () => {
 
@@ -120,4 +136,36 @@ const startPinging = () => {
 };
 
 startPinging();
+
+const startPollingJumpscares = () => {
+  setInterval(async () => {
+    const token = await new Promise((resolve) =>
+      chrome.storage.local.get(['authToken'], (res) => resolve(res.authToken))
+    );
+
+    if (!token) return;
+
+    try {
+
+      console.log
+      const res = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/jumpscare/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+
+      if (data && data.id) {
+        console.log('JUMPSCARE INCOMING:', data);
+        checkIfOnBlockedSite(true);
+      }
+      else {
+        console.log('no jumpscares');
+      }
+    } catch (err) {
+      console.error('Polling error:', err);
+    }
+  }, 3000);
+};
+
+startPollingJumpscares();
 

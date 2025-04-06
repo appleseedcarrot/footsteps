@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useUser } from '@/contexts/userContext';
 import { useFriends } from '../hooks/useFriends';
+import { sendJumpscare } from '../utils/sendJumpscare';
 import ToggleSwitch from '../toggleSwitch/ToggleSwitch';
 import '../popup/Popup.css'
 
@@ -70,10 +71,13 @@ export const Popup = () => {
                       borderRadius: '4px',
                       cursor: 'pointer',
                     }}
-                    onClick={() => {
-                      // Placeholder - implement this later
-                      console.log(`Send jumpscare to: ${f.user?.email}`);
-                      alert(`Sending jumpscare to ${f.user?.username || f.user?.email}!`);
+                    onClick={async() => {
+                      try {
+                        await sendJumpscare(f.friendId);
+                        alert(`Sent jumpscare to ${f.user.username || f.user.email}!`);
+                      } catch (err) {
+                        alert(err.message || 'Failed to send jumpscare');
+                      }
                     }}
                   >
                     Jumpscare
