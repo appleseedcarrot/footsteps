@@ -58,6 +58,26 @@ export const Popup = () => {
                   title={isOnline ? 'Online' : 'Offline'}
                 />
                 {f.status === 'pending' ? ' (Pending)' : ''}
+                {isOnline && f.status === 'accepted' && (
+                  <button
+                    style={{
+                      marginLeft: '8px',
+                      padding: '2px 6px',
+                      fontSize: '0.75rem',
+                      backgroundColor: '#f87171',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      // Placeholder - implement this later
+                      console.log(`Send jumpscare to: ${f.user?.email}`);
+                      alert(`Sending jumpscare to ${f.user?.username || f.user?.email}!`);
+                    }}
+                  >
+                    Jumpscare
+                  </button> )}
               </li>
             );
           })}
