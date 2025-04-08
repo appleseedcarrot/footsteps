@@ -1,17 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser } from '@/contexts/userContext';
 import { useFriends } from '../hooks/useFriends';
 import { sendJumpscare } from '../utils/sendJumpscare';
-import ToggleSwitch from '../toggleSwitch/ToggleSwitch';
-import '../popup/Popup.css'
+import ToggleSwitch from './toggleSwitch/ToggleSwitch';
+import '../popup/Popup.css';
 
 export const Popup = () => {
   const { user, isLoading, logout } = useUser();
-  const { friends, loading: loadingFriends } = useFriends(user);
+  const [refreshCount, setRefreshCount] = useState(0);
+  const { friends, loading: loadingFriends } = useFriends(user, refreshCount);
 
-  console.log("use friends:", friends);
-
-  // Make sure user is logged in, otherwise direct to login/signup
   useEffect(() => {
     if (!isLoading && !user) {
       console.log('Redirecting to login.html');
@@ -25,15 +23,28 @@ export const Popup = () => {
   return (
     <main>
       <h1>You should be studying...</h1>
-      
+
       <div className="toggle-container">
         <ToggleSwitch />
       </div>
-      
-      <h3>
-        Friends
-      </h3>
-      
+
+      <h3>Friends</h3>
+      <button
+        style={{
+          marginBottom: '1rem',
+          padding: '0.3rem 0.7rem',
+          fontSize: '0.8rem',
+          backgroundColor: '#3b82f6',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+        }}
+        onClick={() => setRefreshCount(prev => prev + 1)}
+      >
+        Refresh
+      </button>
+
       {loadingFriends ? (
         <p>Loading friends...</p>
       ) : friends.length === 0 ? (
@@ -71,7 +82,7 @@ export const Popup = () => {
                       borderRadius: '4px',
                       cursor: 'pointer',
                     }}
-                    onClick={async() => {
+                    onClick={async () => {
                       try {
                         await sendJumpscare(f.friendId);
                         alert(`Sent jumpscare to ${f.user.username || f.user.email}!`);
@@ -81,7 +92,8 @@ export const Popup = () => {
                     }}
                   >
                     Jumpscare
-                  </button> )}
+                  </button>
+                )}
               </li>
             );
           })}
@@ -105,7 +117,7 @@ export const Popup = () => {
       >
         Manage Friends
       </button>
-      
+
       <button className="logout" onClick={logout}>
         Log Out
       </button>

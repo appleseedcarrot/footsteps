@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export const useFriends = (user) => {
+export const useFriends = (user, refreshTrigger) => {
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +52,7 @@ export const useFriends = (user) => {
     };
 
     fetchFriends();
-  }, [user]);
+  }, [user, refreshTrigger]);
 
   return { friends, loading };
 };

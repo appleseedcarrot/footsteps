@@ -1,5 +1,5 @@
-
-console.log("running script");
+import { startRealTimeJumpscareListener } from './jumpscarePoller';
+import { startPinging } from './ping';
 
 // Default settings
 const DEFAULT_SETTINGS = {
@@ -9,8 +9,8 @@ const DEFAULT_SETTINGS = {
 };
 
 // Get the initial blocked sites set in options
-let blockedSites = []
-let glitchEnabled = true;
+let blockedSites = DEFAULT_SETTINGS.blocklist;
+let glitchEnabled = DEFAULT_SETTINGS.glitchEnabled;
 let checkInterval = DEFAULT_SETTINGS.checkIntervalMinutes;
 
 // Load settings
@@ -37,157 +37,18 @@ loadSettings();
 
 // Listener for blocklist (if user updates blocklist)
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === "sync" && changes.blocklist) {
-    blockedSites = changes.blocklist.newValue
-  }
-})
-  
+  if (areaName !== "sync") return;
 
-// Listener for settings changes
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === "sync") {
-    if (changes.blocklist) {
-      blockedSites = changes.blocklist.newValue;
-    }
-    if (changes.glitchEnabled) {
-      glitchEnabled = changes.glitchEnabled.newValue;
-    }
-    if (changes.checkIntervalMinutes) {
-      checkInterval = changes.checkIntervalMinutes.newValue;
-      updateCheckInterval();
-    }
+  if (changes.blocklist) blocklist = changes.blocklist.newValue;
+  if (changes.glitchEnabled) glitchEnabled = changes.glitchEnabled.newValue;
+  if (changes.checkIntervalMinutes) {
+    checkIntervalMinutes = changes.checkIntervalMinutes.newValue;
+    updateCheckAlarm();
   }
 });
 
-// // Add listener to check on the set interval
-// chrome.runtime.onInstalled.addListener(() => {
-//   chrome.alarms.create("checkTab", { periodInMinutes: checkInterval });
-// });
-
-// const checkIfOnBlockedSite = (glitchEnabled = false) => {
-//   chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-//     const tab = tabs[0];
-//     if (tab && tab.url) {
-//       if (blockedSites.some((site) => tab.url.includes(site))) {
-//         console.log("You're on a blocked site!!!");
-
-//         chrome.tabs.sendMessage(tab.id, {
-//           action: "playSound",
-//           glitchEnabled: glitchEnabled,
-//         });
-//       }
-//     }
-//   });
-// };
-
-// Listener for alarm
-// chrome.alarms.onAlarm.addListener((alarm) => {
-//   if (alarm.name === "checkTab") {
-//     chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-//       const tab = tabs[0];
-//       if (tab && tab.url) {
-//         // Check if user is on a blocked site
-//         if (blockedSites.some(site => tab.url.includes(site))) {
-//           console.log("You're on a blocked site!!!");
-
-//           // Send to content script to play sound and activate glitch
-//           chrome.tabs.sendMessage(tab.id, { 
-//             action: "playSound",
-//             glitchEnabled: glitchEnabled
-//           });
-//         }
-//       }
-//     });
-//   }
-// });
-
-const startPinging = () => {
-
-  // grab token
-  const loop = async () => {
-    const token = await new Promise((resolve) => {
-      chrome.storage.local.get(['authToken'], (result) => {
-        resolve(result.authToken);
-      });
-    });
-    
-    if (!token) { return; }
-
-    // update status online
-    const url = `${import.meta.env.VITE_APP_BACKEND_URL}/auth/ping`;
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      console.log('[PING] Response:', data);
-    } catch (err) {
-      console.error('[PING] Error:', err.message || err);
-    }
-
-    setTimeout(loop, 1500); // schedule the next ping only after this one is done
-  };
-
-  loop(); // start
-};
-
 startPinging();
-
-const startPollingJumpscares = () => {
-  setInterval(async () => {
-    const token = await new Promise((resolve) =>
-      chrome.storage.local.get(['authToken'], (res) => resolve(res.authToken))
-    );
-
-    if (!token) return;
-
-    try {
-      const res = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/jumpscare/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = await res.json();
-
-      if (data.length > 0) {
-        console.log('JUMPSCARE INCOMING:', data);
-
-        // Play footsteps
-        chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-          const tab = tabs[0];
-          if (!tab || !tab.url) return;
-
-          chrome.tabs.sendMessage(tab.id, { action: "playSound" });
-
-          // Wait 5s then check if user is still on a blocked site
-          setTimeout(() => {
-            chrome.tabs.query({ active: true, lastFocusedWindow: true }, (checkTabs) => {
-              const currentTab = checkTabs[0];
-
-              if (
-                currentTab &&
-                currentTab.id === tab.id &&
-                blockedSites.some((site) => currentTab.url.includes(site))
-              ) {
-                // STILL on blocked site = send jumpscare
-                chrome.tabs.sendMessage(currentTab.id, { action: "JUMPSCARE", data });
-              } else {
-                console.log("User escaped the jumpscare 👀");
-              }
-            });
-          }, 5000);
-        });
-
-        return;
-      }
-    } catch (err) {
-      console.error('Polling error:', err);
-    }
-  }, 3000);
-};
-
-startPollingJumpscares();
+if (typeof window !== "undefined") {
+  startRealTimeJumpscareListener();
+}
 

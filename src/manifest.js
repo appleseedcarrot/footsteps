@@ -19,7 +19,6 @@ export default defineManifest({
     default_icon: 'img/logo-48.png',
   },
   options_page: 'options.html',
-  devtools_page: 'devtools.html',
   background: {
     service_worker: 'src/background/index.js',
     type: 'module',
@@ -30,9 +29,6 @@ export default defineManifest({
       js: ['src/contentScript/index.js'],
     },
   ],
-  side_panel: {
-    default_path: 'sidepanel.html',
-  },
   web_accessible_resources: [
     {
       resources: ['img/logo-16.png',
@@ -48,9 +44,6 @@ export default defineManifest({
       matches: ['<all_urls>'],
     },
   ],
-  permissions: ['alarms', 'tabs', 'sidePanel', 'storage', 'tabs'],
+  permissions: ['alarms', 'tabs', 'storage', 'tabs'],
   host_permissions: ['http://localhost:5050/*'],
-  chrome_url_overrides: {
-    newtab: 'newtab.html',
-  },
 })
