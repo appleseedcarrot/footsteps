@@ -1,17 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser } from '@/contexts/userContext';
 import { useFriends } from '../hooks/useFriends';
 import { sendJumpscare } from '../utils/sendJumpscare';
-import ToggleSwitch from '../toggleSwitch/ToggleSwitch';
-import '../popup/Popup.css'
+import ToggleSwitch from './toggleSwitch/ToggleSwitch';
+import placeholderPic from '@/assets/avatar-placeholder.png';
+import '../popup/Popup.css';
 
 export const Popup = () => {
   const { user, isLoading, logout } = useUser();
-  const { friends, loading: loadingFriends } = useFriends(user);
+  const [refreshCount, setRefreshCount] = useState(0);
+  const { friends, loading: loadingFriends } = useFriends(user, refreshCount);
 
-  console.log("use friends:", friends);
-
-  // Make sure user is logged in, otherwise direct to login/signup
   useEffect(() => {
     if (!isLoading && !user) {
       console.log('Redirecting to login.html');
@@ -25,67 +24,105 @@ export const Popup = () => {
   return (
     <main>
       <h1>You should be studying...</h1>
-      
+
       <div className="toggle-container">
         <ToggleSwitch />
       </div>
-      
-      <h3>
-        Friends
-      </h3>
-      
+
+      <h3>Friends</h3>
+      <button
+        style={{
+          marginBottom: '1rem',
+          padding: '0.3rem 0.7rem',
+          fontSize: '0.8rem',
+          backgroundColor: '#3b82f6',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+        }}
+        onClick={() => setRefreshCount(prev => prev + 1)}
+      >
+        Refresh
+      </button>
+
       {loadingFriends ? (
         <p>Loading friends...</p>
-      ) : friends.length === 0 ? (
+      ) : friends.filter(f => f.status === 'accepted').length === 0 ? (
         <p>You don't have any friends yet.</p>
       ) : (
-        <ul>
-          {friends.map((f) => {
-            const lastSeen = f.user?.last_seen;
-            const isOnline = lastSeen && (new Date() - new Date(lastSeen)) < 30 * 1000;
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {friends
+            .filter((f) => f.status === 'accepted')
+            .map((f) => {
+              const lastSeen = f.user?.last_seen;
+              const isOnline = lastSeen && (new Date() - new Date(lastSeen)) < 30 * 1000;
 
-            return (
-              <li key={f.id}>
-                {f.user?.username || f.user?.email || 'Unknown User'}
-                <span
+              return (
+                <div
+                  key={f.id}
                   style={{
-                    display: 'inline-block',
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    backgroundColor: isOnline ? 'green' : 'gray',
-                    marginLeft: 6,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0.75rem 1rem',
+                    backgroundColor: '#f9fafb',
+                    borderRadius: '8px',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                   }}
-                  title={isOnline ? 'Online' : 'Offline'}
-                />
-                {f.status === 'pending' ? ' (Pending)' : ''}
-                {isOnline && f.status === 'accepted' && (
-                  <button
-                    style={{
-                      marginLeft: '8px',
-                      padding: '2px 6px',
-                      fontSize: '0.75rem',
-                      backgroundColor: '#f87171',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                    }}
-                    onClick={async() => {
-                      try {
-                        await sendJumpscare(f.friendId);
-                        alert(`Sent jumpscare to ${f.user.username || f.user.email}!`);
-                      } catch (err) {
-                        alert(err.message || 'Failed to send jumpscare');
-                      }
-                    }}
-                  >
-                    Jumpscare
-                  </button> )}
-              </li>
-            );
-          })}
-        </ul>
+                >
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img
+                      src={f.user?.avatar_url || placeholderPic}
+                      alt="Avatar"
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        marginRight: '0.75rem',
+                        objectFit: 'cover',
+                      }}
+                    />
+                    <div>
+                      <div>{f.user?.username || f.user?.email || 'Unknown User'}</div>
+                      <div
+                        style={{
+                          fontSize: '0.75rem',
+                          color: isOnline ? 'green' : 'gray',
+                        }}
+                      >
+                        {isOnline ? 'Online' : 'Offline'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {isOnline && (
+                    <button
+                      style={{
+                        padding: '0.3rem 0.6rem',
+                        fontSize: '0.75rem',
+                        backgroundColor: '#ef4444',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                      onClick={async () => {
+                        try {
+                          await sendJumpscare(f.friendId);
+                          alert(`Sent jumpscare to ${f.user.username || f.user.email}!`);
+                        } catch (err) {
+                          alert(err.message || 'Failed to send jumpscare');
+                        }
+                      }}
+                    >
+                      Jumpscare
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+        </div>
       )}
 
       <button
@@ -105,7 +142,7 @@ export const Popup = () => {
       >
         Manage Friends
       </button>
-      
+
       <button className="logout" onClick={logout}>
         Log Out
       </button>

@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 
-export const useFriends = (user) => {
+export const useFriends = (user, refreshCount) => {
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFriends = async () => {
-      if (!user) return;
+      setLoading(true);
+
+      if (!user) {
+        return;
+      }
 
       const token = await new Promise((resolve) =>
         chrome.storage.local.get('authToken', (result) => resolve(result.authToken))
@@ -52,7 +56,7 @@ export const useFriends = (user) => {
     };
 
     fetchFriends();
-  }, [user]);
+  }, [user, refreshCount]);
 
   return { friends, loading };
 };

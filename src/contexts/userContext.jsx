@@ -44,7 +44,7 @@ export function UserProvider({ children }) {
       const userData = await response.json();
       console.log('User data:', userData);
       setUser(userData);
-      return true;
+      return userData;
     } catch (error) {
       console.error('Auth check error:', error);
       setUser(null);
@@ -94,8 +94,10 @@ export function UserProvider({ children }) {
 
       const { token } = await response.json();
       console.log('Token received:', token);
-      chrome.storage.local.set({ authToken: token });
-      await checkAuth();
+      chrome.storage.local.set({authToken: token});
+      const user = await checkAuth();
+      chrome.storage.local.set({userId: user.id });
+      console.log("userid", user.id);
       return true;
     } catch (error) {
       console.error('Login error:', error);
@@ -114,7 +116,8 @@ export function UserProvider({ children }) {
         throw new Error('Logout failed');
       }
 
-      await chrome.storage.local.remove('authToken');
+      await chrome.storage.local.remove(['authToken']);
+      await chrome.storage.local.remove(['userId']);
 
       setUser(null);
       return true;
