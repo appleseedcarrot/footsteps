@@ -5,11 +5,53 @@ import { sendJumpscare } from '../utils/sendJumpscare';
 import ToggleSwitch from './toggleSwitch/ToggleSwitch';
 import placeholderPic from '@/assets/avatar-placeholder.png';
 import '../popup/Popup.css';
+import { supabase } from '../utils/supabaseClient';
 
 export const Popup = () => {
   const { user, isLoading, logout } = useUser();
   const [refreshCount, setRefreshCount] = useState(0);
   const { friends, loading: loadingFriends } = useFriends(user, refreshCount);
+  const [loadingJumpscareId, setLoadingJumpscareId] = useState(null);
+
+  const handleSendJumpscare = async (friendId) => {
+    setLoadingJumpscareId(friendId);
+    console.log("supabase:", supabase);
+
+    try {
+      const scare = await sendJumpscare(friendId); // should return jumpscare id
+      console.log("scare,", scare);
+  
+      const timeout = setTimeout(async () => {
+        const { data, error } = await supabase
+          .from('jumpscares')
+          .select('result')
+          .eq('id', scare.id)
+          .single();
+        
+        console.log(data);
+  
+        setLoadingJumpscareId(null);
+  
+        if (error || !data) {
+          alert('Could not determine outcome ');
+          return;
+        }
+  
+        if (data.result === 'caught') {
+          alert('Success! They got jumpscared');
+        } else if (data.result === 'escaped') {
+          alert('They escaped');
+        } else {
+          alert(`Unknown result: ${data.result}`);
+        }
+
+        setRefreshCount(count => count + 1);
+      }, 7000); // Wait 7s for jumpscare to resolve
+  
+    } catch (err) {
+      setLoadingJumpscareId(null);
+      alert(err.message || 'Failed to send jumpscare');
+  }};
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -55,7 +97,7 @@ export const Popup = () => {
           {friends
             .filter((f) => f.status === 'accepted')
             .map((f) => {
-              const lastSeen = f.user?.last_seen;
+              let lastSeen = f.user?.last_seen;
               const isOnline = lastSeen && (new Date() - new Date(lastSeen)) < 30 * 1000;
 
               return (
@@ -96,7 +138,10 @@ export const Popup = () => {
                     </div>
                   </div>
 
-                  {isOnline && (
+                  {isOnline && f.status === 'accepted' && (
+                    loadingJumpscareId === f.friendId ? (
+                      <div className="spinner" style={{ marginLeft: '10px' }} />
+                    ) : (
                     <button
                       style={{
                         padding: '0.3rem 0.6rem',
@@ -107,18 +152,11 @@ export const Popup = () => {
                         borderRadius: '4px',
                         cursor: 'pointer',
                       }}
-                      onClick={async () => {
-                        try {
-                          await sendJumpscare(f.friendId);
-                          alert(`Sent jumpscare to ${f.user.username || f.user.email}!`);
-                        } catch (err) {
-                          alert(err.message || 'Failed to send jumpscare');
-                        }
-                      }}
-                    >
+                      onClick={() => handleSendJumpscare(f.friendId)}
+                      >
                       Jumpscare
-                    </button>
-                  )}
+                      </button>
+                      ))}
                 </div>
               );
             })}

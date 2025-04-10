@@ -39,10 +39,10 @@ loadSettings();
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== "sync") return;
 
-  if (changes.blocklist) blocklist = changes.blocklist.newValue;
+  if (changes.blocklist) blockedSites = changes.blocklist.newValue;
   if (changes.glitchEnabled) glitchEnabled = changes.glitchEnabled.newValue;
   if (changes.checkIntervalMinutes) {
-    checkIntervalMinutes = changes.checkIntervalMinutes.newValue;
+    checkInterval = changes.checkIntervalMinutes.newValue;
     updateCheckAlarm();
   }
 });
@@ -67,7 +67,6 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     // User logged out
     console.log('[BG] User logged out. Stopping listeners.');
     hasInitialized = false;
-    // Optionally stop real-time subscriptions here if you have a cleanup function
   }
 });
 
@@ -77,5 +76,5 @@ function startListeners(userId) {
 
   console.log('[BG] User logged in. Starting ping and realtime listeners...');
   startPinging();
-  startRealTimeJumpscareListener(userId);
+  startRealTimeJumpscareListener(userId, blockedSites);
 }

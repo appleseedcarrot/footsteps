@@ -14,6 +14,8 @@ export async function sendJumpscare(friendId) {
     });
   
     const data = await res.json();
+
     if (!res.ok) throw new Error(data.error || 'Failed to send jumpscare');
+    console.log("data from jumpscare send:", data);
     return data;
 }

@@ -1,8 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
+import { receiveJumpscare } from '../utils/receiveJumpscare';
+import { supabase } from '../utils/supabaseClient';
 
-const supabase = createClient(import.meta.env.VITE_APP_SUPABASE_URL, import.meta.env.VITE_APP_SUPABASE_ANON_KEY);
-
-export const startRealTimeJumpscareListener = (userId) => {
+export const startRealTimeJumpscareListener = (userId, blockedSites) => {
     supabase.channel('custom-insert-channel')
       .on('postgres_changes',
         {
@@ -10,7 +9,7 @@ export const startRealTimeJumpscareListener = (userId) => {
           (payload) => {
             const scare = payload.new;
             if (scare.recipient_id === userId) {
-              console.log('Jumpscare Received')
+              receiveJumpscare(userId, blockedSites, payload, supabase);
             }
           }
       )
